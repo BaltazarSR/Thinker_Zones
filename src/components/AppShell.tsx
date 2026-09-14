@@ -95,7 +95,7 @@ function curseRemainingLabel(cursedUntil: number, now: number): string {
 
 // The server phrases every curse rejection with the word "cursed" — used to
 // route those specific errors into the dedicated CursedModal instead of a
-// window.alert() or the usual inline error text under a button.
+// window.alert() or the usual inline error text under a button..
 function isCursedMessage(message: string): boolean {
   return message.toLowerCase().includes("cursed");
 }
