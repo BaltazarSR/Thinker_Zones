@@ -89,6 +89,22 @@ export async function updateName(name: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+// Rotates session_token on success (see change_password in Supabase), so the
+// new token has to replace the stored one or the next request would 401.
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  const token = getSessionToken();
+  if (!token) throw new Error("Not logged in.");
+  const { data, error } = await supabase.rpc("change_password", {
+    p_session_token: token,
+    p_current_password: currentPassword,
+    p_new_password: newPassword,
+  });
+  if (error) throw new Error(error.message);
+  const row = firstRow<{ session_token: string }>(data);
+  if (!row?.session_token) throw new Error("Couldn't change your password.");
+  setSessionToken(row.session_token);
+}
+
 export async function uploadAvatar(file: File): Promise<void> {
   const token = getSessionToken();
   if (!token) throw new Error("Not logged in.");

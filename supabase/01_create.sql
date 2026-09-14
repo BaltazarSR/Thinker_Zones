@@ -175,7 +175,7 @@ create table public.zone_uprisings (
   initiator_id uuid not null references public.players (id),
   status text not null default 'gathering'
     check (status in ('gathering', 'succeeded', 'expired', 'cancelled')),
-  threshold int not null default 3,
+  threshold int not null default 2,
   deadline timestamptz not null,
   created_at timestamptz not null default now()
 );
@@ -1543,12 +1543,12 @@ begin
   end if;
 
   insert into zone_uprisings (zone_id, initiator_id, threshold, deadline)
-  values (p_zone_id, v_player_id, 3, now() + interval '24 hours')
+  values (p_zone_id, v_player_id, 2, now() + interval '24 hours')
   returning id, deadline into v_uprising_id, v_deadline;
 
   return jsonb_build_object(
     'id', v_uprising_id, 'zoneId', p_zone_id, 'status', 'gathering',
-    'threshold', 3, 'supporterCount', 0, 'deadline', v_deadline
+    'threshold', 2, 'supporterCount', 0, 'deadline', v_deadline
   );
 end;
 $$;

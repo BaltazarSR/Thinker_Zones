@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { signOut, updateName, uploadAvatar } from "@/lib/supabase/mutations";
+import { changePassword, signOut, updateName, uploadAvatar } from "@/lib/supabase/mutations";
 import type { Player } from "@/lib/types";
 import Avatar from "./Avatar";
 import { CloseIcon } from "./icons";
@@ -21,7 +21,16 @@ export default function SettingsScreen({ player, onClose, onLoggedOut, onProfile
   const [photoError, setPhotoError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+
   const nameChanged = name.trim().length > 0 && name.trim() !== player.name;
+  const canSavePassword =
+    currentPassword.length > 0 && newPassword.length >= 6 && newPassword === confirmPassword && !savingPassword;
 
   const handleSaveName = async () => {
     if (!nameChanged || savingName) return;
@@ -34,6 +43,24 @@ export default function SettingsScreen({ player, onClose, onLoggedOut, onProfile
       setNameError(err instanceof Error ? err.message : "Couldn't save that name.");
     } finally {
       setSavingName(false);
+    }
+  };
+
+  const handleSavePassword = async () => {
+    if (!canSavePassword) return;
+    setSavingPassword(true);
+    setPasswordError(null);
+    setPasswordSaved(false);
+    try {
+      await changePassword(currentPassword, newPassword);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordSaved(true);
+    } catch (err) {
+      setPasswordError(err instanceof Error ? err.message : "Couldn't change your password.");
+    } finally {
+      setSavingPassword(false);
     }
   };
 
@@ -129,6 +156,77 @@ export default function SettingsScreen({ player, onClose, onLoggedOut, onProfile
           style={{ background: "#ffffff", color: "#0a0a0a" }}
         >
           {savingName ? "Saving…" : "Save Name"}
+        </button>
+
+        <h3 className="mt-8 text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+          Password
+        </h3>
+        <input
+          type="password"
+          value={currentPassword}
+          onChange={(e) => {
+            setCurrentPassword(e.target.value);
+            setPasswordSaved(false);
+          }}
+          placeholder="Current password"
+          autoComplete="current-password"
+          className="mt-2 h-14 w-full rounded-2xl border-2 px-4 text-base outline-none"
+          style={{
+            background: "var(--surface-2)",
+            borderColor: "var(--border-input)",
+            color: "var(--text-primary, #fff)",
+          }}
+        />
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => {
+            setNewPassword(e.target.value);
+            setPasswordSaved(false);
+          }}
+          placeholder="New password"
+          autoComplete="new-password"
+          className="mt-3 h-14 w-full rounded-2xl border-2 px-4 text-base outline-none"
+          style={{
+            background: "var(--surface-2)",
+            borderColor: "var(--border-input)",
+            color: "var(--text-primary, #fff)",
+          }}
+        />
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => {
+            setConfirmPassword(e.target.value);
+            setPasswordSaved(false);
+          }}
+          placeholder="Confirm new password"
+          autoComplete="new-password"
+          className="mt-3 h-14 w-full rounded-2xl border-2 px-4 text-base outline-none"
+          style={{
+            background: "var(--surface-2)",
+            borderColor: "var(--border-input)",
+            color: "var(--text-primary, #fff)",
+          }}
+        />
+        {passwordError && (
+          <p className="mt-2 text-sm font-medium" style={{ color: "#ff6a6a" }}>
+            {passwordError}
+          </p>
+        )}
+        {passwordSaved && (
+          <p className="mt-2 text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+            Password updated.
+          </p>
+        )}
+        <button
+          type="button"
+          disabled={!canSavePassword}
+          onClick={handleSavePassword}
+          className="mt-3 h-14 w-full rounded-2xl text-base font-bold uppercase tracking-wide transition-colors duration-150 disabled:opacity-40 active:opacity-80"
+          style={{ background: "#ffffff", color: "#0a0a0a" }}
+        >
+          {savingPassword ? "Saving…" : "Save Password"}
         </button>
       </div>
 
