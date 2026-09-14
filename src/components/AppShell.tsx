@@ -854,21 +854,21 @@ export default function AppShell({ userId, onLoggedOut }: AppShellProps) {
   };
 
   const handleCapture = async (zone: Zone) => {
-    if (!(await ensureInsideZone(zone))) return;
-    if (zone.tier === "home" || !zone.activeContestId) {
-      // No contest exists yet for this regular zone — just open the form
-      // directly instead of pre-emptively calling attemptCaptureZone.
-      // Opening the form should not, by itself, start the background
-      // contest window; capture_zone creates it lazily only if/when the
-      // player actually submits, so cancelling out of the form leaves no
-      // trace instead of starting a contest nobody's actually contesting.
-      setContest(null);
-      setCaptureOpen(true);
-      return;
-    }
-    setContest(null);
     setCapturingZoneId(zone.id);
     try {
+      if (!(await ensureInsideZone(zone))) return;
+      if (zone.tier === "home" || !zone.activeContestId) {
+        // No contest exists yet for this regular zone — just open the form
+        // directly instead of pre-emptively calling attemptCaptureZone.
+        // Opening the form should not, by itself, start the background
+        // contest window; capture_zone creates it lazily only if/when the
+        // player actually submits, so cancelling out of the form leaves no
+        // trace instead of starting a contest nobody's actually contesting.
+        setContest(null);
+        setCaptureOpen(true);
+        return;
+      }
+      setContest(null);
       const res = await attemptCaptureZone(zone.id);
       if (res.mode === "instant") {
         setCaptureOpen(true);
@@ -1014,10 +1014,10 @@ export default function AppShell({ userId, onLoggedOut }: AppShellProps) {
   };
 
   const handleStartUprising = async (zone: Zone) => {
-    if (!(await ensureInsideZone(zone))) return;
     setUprisingSubmitting(true);
     setUprisingError(null);
     try {
+      if (!(await ensureInsideZone(zone))) return;
       await startUprising(zone.id);
       setZones(await fetchZones());
     } catch (err) {
@@ -1053,10 +1053,10 @@ export default function AppShell({ userId, onLoggedOut }: AppShellProps) {
   };
 
   const handleStartMutiny = async (zone: Zone) => {
-    if (!(await ensureInsideZone(zone))) return;
     setMutinyActionSubmitting(true);
     setMutinyActionError(null);
     try {
+      if (!(await ensureInsideZone(zone))) return;
       const fresh = await startMutiny(zone.id);
       setMutiny(fresh);
       setZones(await fetchZones());
