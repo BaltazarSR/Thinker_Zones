@@ -51,7 +51,12 @@ export function getCurrentPosition(): Promise<LngLat> {
           reject(new LocationError("unavailable", "Couldn't get your location."));
         }
       },
-      { enableHighAccuracy: true, timeout: POSITION_TIMEOUT_MS, maximumAge: 0 },
+      // maximumAge lets this reuse the fix the map's continuous
+      // watchPosition() (for the live dot) already has on hand instead of
+      // forcing a brand-new GPS acquisition that fights that watch for the
+      // same hardware — a position that fresh is still plenty accurate for
+      // an in-zone check.
+      { enableHighAccuracy: true, timeout: POSITION_TIMEOUT_MS, maximumAge: 15_000 },
     );
   });
 }
