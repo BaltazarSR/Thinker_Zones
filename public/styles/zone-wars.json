@@ -1,0 +1,505 @@
+{
+  "version": 8,
+  "name": "Thinkers Zones",
+  "glyphs": "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf",
+  "sources": {
+    "zonewars": {
+      "type": "vector",
+      "tiles": [
+        "pmtiles://{{ORIGIN}}/data/guadalajara.pmtiles/{z}/{x}/{y}"
+      ],
+      "minzoom": 0,
+      "maxzoom": 15,
+      "bounds": [
+        -103.72,
+        20.3,
+        -103,
+        20.95
+      ],
+      "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
+    },
+    "playzone": {
+      "type": "geojson",
+      "data": {
+        "type": "Feature",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              -103.351,
+              20.8
+            ],
+            [
+              -103.42915490502462,
+              20.811873054938815
+            ],
+            [
+              -103.50161734820846,
+              20.81018896231052
+            ],
+            [
+              -103.55966192294174,
+              20.74376785325697
+            ],
+            [
+              -103.59545973001346,
+              20.746099949001177
+            ],
+            [
+              -103.63185918090315,
+              20.728375976993277
+            ],
+            [
+              -103.70315397313864,
+              20.714870605415044
+            ],
+            [
+              -103.72927706933037,
+              20.666964111539983
+            ],
+            [
+              -103.73432238817445,
+              20.597487385142784
+            ],
+            [
+              -103.70856876748954,
+              20.54474367900255
+            ],
+            [
+              -103.66254301553793,
+              20.528968272444402
+            ],
+            [
+              -103.61832219503599,
+              20.49797613195632
+            ],
+            [
+              -103.55334466286952,
+              20.467823217262875
+            ],
+            [
+              -103.53570053507012,
+              20.426417968800337
+            ],
+            [
+              -103.46242589362,
+              20.421117878943818
+            ],
+            [
+              -103.3897027755742,
+              20.429512560801456
+            ],
+            [
+              -103.33320367675847,
+              20.42151873982654
+            ],
+            [
+              -103.28750191780824,
+              20.42204104930002
+            ],
+            [
+              -103.21244699660504,
+              20.455465166510038
+            ],
+            [
+              -103.19130781722026,
+              20.495012485878817
+            ],
+            [
+              -103.18663469034102,
+              20.538738839605102
+            ],
+            [
+              -103.19323181450825,
+              20.588020413428396
+            ],
+            [
+              -103.19238621756911,
+              20.629987713728255
+            ],
+            [
+              -103.20288650445552,
+              20.67399793068377
+            ],
+            [
+              -103.2245623385232,
+              20.72343116676946
+            ],
+            [
+              -103.26348191002982,
+              20.7738435304435
+            ],
+            [
+              -103.351,
+              20.8
+            ]
+          ]
+        },
+        "properties": {}
+      }
+    },
+    "zonewars-roads-minor": {
+      "type": "vector",
+      "tiles": [
+        "pmtiles://{{ORIGIN}}/data/guadalajara-roads.pmtiles/{z}/{x}/{y}"
+      ],
+      "minzoom": 12,
+      "maxzoom": 15,
+      "bounds": [
+        -103.72,
+        20.3,
+        -103,
+        20.95
+      ],
+      "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#000000"
+      }
+    },
+    {
+      "id": "earth",
+      "type": "fill",
+      "source": "zonewars",
+      "source-layer": "earth",
+      "paint": {
+        "fill-color": "#000000"
+      }
+    },
+    {
+      "id": "landcover-grass",
+      "type": "fill",
+      "source": "zonewars",
+      "source-layer": "landcover",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "grass"
+      ],
+      "paint": {
+        "fill-color": "rgba(255,255,255,0.025)"
+      }
+    },
+    {
+      "id": "landcover-forest",
+      "type": "fill",
+      "source": "zonewars",
+      "source-layer": "landcover",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "forest"
+      ],
+      "paint": {
+        "fill-color": "rgba(255,255,255,0.035)"
+      }
+    },
+    {
+      "id": "roads-rail",
+      "type": "line",
+      "source": "zonewars",
+      "source-layer": "roads",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "rail"
+      ],
+      "minzoom": 12,
+      "paint": {
+        "line-color": "#4d4d4d",
+        "line-width": 1,
+        "line-dasharray": [
+          3,
+          2
+        ]
+      }
+    },
+    {
+      "id": "roads-path",
+      "type": "line",
+      "source": "zonewars",
+      "source-layer": "roads",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "path"
+      ],
+      "minzoom": 15,
+      "paint": {
+        "line-color": "#333333",
+        "line-width": 1,
+        "line-dasharray": [
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "id": "roads-minor-casing",
+      "type": "line",
+      "source": "zonewars-roads-minor",
+      "source-layer": "roads",
+      "minzoom": 10,
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#0d0d0d",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          1.5,
+          18,
+          10
+        ]
+      }
+    },
+    {
+      "id": "roads-minor",
+      "type": "line",
+      "source": "zonewars-roads-minor",
+      "source-layer": "roads",
+      "minzoom": 10,
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#595959",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          12,
+          0.5,
+          18,
+          7
+        ]
+      }
+    },
+    {
+      "id": "roads-major-casing",
+      "type": "line",
+      "source": "zonewars",
+      "source-layer": "roads",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "major_road"
+      ],
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#141414",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          8,
+          1,
+          18,
+          14
+        ]
+      }
+    },
+    {
+      "id": "roads-major",
+      "type": "line",
+      "source": "zonewars",
+      "source-layer": "roads",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "major_road"
+      ],
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#999999",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          8,
+          0.4,
+          18,
+          7.5
+        ]
+      }
+    },
+    {
+      "id": "roads-label",
+      "type": "symbol",
+      "source": "zonewars",
+      "source-layer": "roads",
+      "filter": [
+        "all",
+        [
+          "has",
+          "name"
+        ],
+        [
+          "!",
+          [
+            "in",
+            [
+              "get",
+              "kind"
+            ],
+            [
+              "literal",
+              [
+                "path",
+                "highway"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "minzoom": 14,
+      "layout": {
+        "symbol-placement": "line",
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 11
+      },
+      "paint": {
+        "text-color": "rgba(255,255,255,0.6)",
+        "text-halo-color": "rgba(0,0,0,0.8)",
+        "text-halo-width": 1.2
+      }
+    },
+    {
+      "id": "places-label",
+      "type": "symbol",
+      "source": "zonewars",
+      "source-layer": "places",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "neighbourhood"
+      ],
+      "minzoom": 13,
+      "layout": {
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 12,
+        "text-transform": "uppercase",
+        "text-letter-spacing": 0.05
+      },
+      "paint": {
+        "text-color": "rgba(255,255,255,0.4)",
+        "text-halo-color": "rgba(0,0,0,0.8)",
+        "text-halo-width": 1.2
+      }
+    },
+    {
+      "id": "places-label-locality",
+      "type": "symbol",
+      "source": "zonewars",
+      "source-layer": "places",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "locality"
+      ],
+      "maxzoom": 13,
+      "layout": {
+        "text-field": [
+          "get",
+          "name"
+        ],
+        "text-font": [
+          "Noto Sans Regular"
+        ],
+        "text-size": 14,
+        "text-transform": "uppercase",
+        "text-letter-spacing": 0.08
+      },
+      "paint": {
+        "text-color": "#ffffff",
+        "text-halo-color": "rgba(0,0,0,0.8)",
+        "text-halo-width": 1.4
+      }
+    },
+    {
+      "id": "playzone-boundary",
+      "type": "line",
+      "source": "playzone",
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#ff5a36",
+        "line-width": 2,
+        "line-dasharray": [
+          2,
+          1.5
+        ]
+      }
+    }
+  ]
+}

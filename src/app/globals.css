@@ -1,26 +1,119 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #ffffff;
+
+  --surface-1: rgba(255, 255, 255, 0.02);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --surface-hover-active: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-disabled: rgba(255, 255, 255, 0.2);
+
+  --border-container: rgba(255, 255, 255, 0.06);
+  --border-container-alt: rgba(255, 255, 255, 0.07);
+  --border-input: rgba(255, 255, 255, 0.1);
+  --border-input-focus: rgba(255, 255, 255, 0.25);
+  --border-input-hover: rgba(255, 255, 255, 0.12);
+  --border-divider: rgba(255, 255, 255, 0.05);
+
+  --radius-primary: 12px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-hover-active: var(--surface-hover-active);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-disabled: var(--text-disabled);
+  --color-border-container: var(--border-container);
+  --color-border-input: var(--border-input);
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  /* Disables iOS's native elastic rubber-band animation at the true top of
+     the page — the JS scroll floor in AppShell.tsx can correct the scroll
+     *position* almost instantly, but can't stop that native elastic
+     animation once it starts playing; this is what actually stops it. */
+  overscroll-behavior-y: none;
+}
+
+/* MapLibre control chrome, themed to match the app's dark design system */
+.maplibregl-map .maplibregl-ctrl-group {
+  background: var(--surface-2);
+  border: 1px solid var(--border-container);
+  border-radius: var(--radius-primary);
+  overflow: hidden;
+}
+.maplibregl-map .maplibregl-ctrl-group:not(:empty) {
+  box-shadow: none;
+}
+.maplibregl-map .maplibregl-ctrl-group button {
+  background-color: transparent;
+  transition: background-color 150ms;
+}
+.maplibregl-map .maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border-divider);
+}
+.maplibregl-map .maplibregl-ctrl-group button:hover {
+  background-color: var(--surface-hover);
+}
+.maplibregl-map .maplibregl-ctrl-icon {
+  filter: invert(1);
+  opacity: 0.85;
+}
+.maplibregl-map .maplibregl-ctrl button:disabled .maplibregl-ctrl-icon {
+  opacity: 0.2;
+}
+.maplibregl-map .maplibregl-ctrl-attrib {
+  background-color: transparent;
+}
+.maplibregl-map .maplibregl-ctrl-attrib.maplibregl-compact {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border-container);
+}
+.maplibregl-map .maplibregl-ctrl-attrib a {
+  color: var(--text-tertiary);
+}
+.maplibregl-map .maplibregl-ctrl-attrib a:hover {
+  color: var(--text-secondary);
+}
+.maplibregl-map .maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+  opacity: 0.6;
+}
+/* Geolocate control stays mounted (so it can be triggered programmatically
+   to show the player's dot on load) but its button is hidden — location
+   tracking shouldn't require a manual tap. */
+.maplibregl-map .maplibregl-ctrl-geolocate {
+  display: none;
+}
+
+@keyframes contest-pop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
 }
