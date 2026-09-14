@@ -84,6 +84,11 @@ export interface Zone {
   // both null once expired or claimed.
   pendingPlunderFromId: string | null;
   pendingPlunderDeadline: number | null;
+  // Anti-ping-pong: set for 2h after every regular-zone capture (once any
+  // contest for it settles), null once it passes. Only ever set for
+  // "regular" zones — home/invaded zones use the curse/Boss Raid cooldown
+  // instead.
+  captureCooldownUntil: number | null;
   // Uprising summary — only ever set while tier is "invaded".
   activeUprisingId: string | null;
   activeUprisingDeadline: number | null;

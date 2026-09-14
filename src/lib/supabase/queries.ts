@@ -61,6 +61,7 @@ interface ZoneRow {
   my_cooldown_until: string | null;
   pending_plunder_from_id: string | null;
   pending_plunder_deadline: string | null;
+  capture_cooldown_until: string | null;
   active_uprising_id: string | null;
   active_uprising_deadline: string | null;
   active_uprising_threshold: number | null;
@@ -125,6 +126,7 @@ function rowToZone(row: ZoneRow): Zone {
     myCooldownUntil: row.my_cooldown_until ? new Date(row.my_cooldown_until).getTime() : null,
     pendingPlunderFromId: row.pending_plunder_from_id,
     pendingPlunderDeadline: row.pending_plunder_deadline ? new Date(row.pending_plunder_deadline).getTime() : null,
+    captureCooldownUntil: row.capture_cooldown_until ? new Date(row.capture_cooldown_until).getTime() : null,
     activeUprisingId: row.active_uprising_id,
     activeUprisingDeadline: row.active_uprising_deadline ? new Date(row.active_uprising_deadline).getTime() : null,
     activeUprisingThreshold: row.active_uprising_threshold,

@@ -117,7 +117,8 @@ begin
       last_attacker_id = null,
       original_owner_id = null,
       pending_plunder_from_id = null,
-      pending_plunder_deadline = null
+      pending_plunder_deadline = null,
+      capture_cooldown_until = null
   where owner_id = v_player_id;
   update zones set last_attacker_id = null where last_attacker_id = v_player_id;
   update zones set original_owner_id = null where original_owner_id = v_player_id;

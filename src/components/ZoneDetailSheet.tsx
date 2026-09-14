@@ -112,6 +112,12 @@ export default function ZoneDetailSheet({
   const bossMaxHp = zone.bossMaxHp ?? 0;
   const onCooldown = Boolean(zone.myCooldownUntil && zone.myCooldownUntil > now);
   const mustWaitForBackup = zone.lastAttackerId === currentPlayerId;
+  // Anti-ping-pong cooldown on regular zones — never blocks joining a
+  // contest that's already underway, only starting a fresh one (mirrors the
+  // server-side gate in capture_zone/attempt_capture_zone).
+  const zoneOnCooldown = Boolean(
+    !isHome && !isInvaded && !zone.activeContestId && zone.captureCooldownUntil && zone.captureCooldownUntil > now
+  );
 
   const hasActiveUprising = Boolean(zone.activeUprisingId);
   // The original owner is always an Uprising's starter — start_uprising only
@@ -414,7 +420,7 @@ export default function ZoneDetailSheet({
           <button
             type="button"
             onClick={onCapture}
-            disabled={capturing || (isHome && (mustWaitForBackup || onCooldown))}
+            disabled={capturing || (isHome && (mustWaitForBackup || onCooldown)) || zoneOnCooldown}
             className="mt-7 h-16 w-full rounded-2xl text-lg font-bold uppercase tracking-wide transition-colors duration-150 disabled:opacity-40 active:opacity-80"
             style={{ background: "#ffffff", color: "#0a0a0a" }}
           >
@@ -427,7 +433,9 @@ export default function ZoneDetailSheet({
                     ? "On cooldown"
                     : "Attack"
                 : !zone.activeContestId
-                  ? "Capture"
+                  ? zoneOnCooldown
+                    ? `Cooldown: ${countdown(zone.captureCooldownUntil ?? 0, now)}`
+                    : "Capture"
                   : zone.activeContestStatus === "joining"
                     ? "Join the fight"
                     : "Spectate"}

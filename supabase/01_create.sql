@@ -61,6 +61,11 @@ create table public.zones (
   -- Open "choose your spoils" offer after a Boss Raid finishing blow.
   pending_plunder_from_id uuid references public.players (id),
   pending_plunder_deadline timestamptz,
+  -- Anti-ping-pong: set for 2h after every *regular*-zone capture (see
+  -- _apply_capture) so it can't be immediately recaptured back and forth.
+  -- Home/invaded zones never touch this — they're governed by the Boss Raid
+  -- cooldown/curse and Mutiny/Uprising rules instead (see 07_home_zone_boss.sql).
+  capture_cooldown_until timestamptz,
   created_at timestamptz not null default now()
 );
 
@@ -416,6 +421,7 @@ begin
       'original_owner_id', z.original_owner_id,
       'pending_plunder_from_id', case when z.pending_plunder_deadline > now() then z.pending_plunder_from_id end,
       'pending_plunder_deadline', case when z.pending_plunder_deadline > now() then z.pending_plunder_deadline end,
+      'capture_cooldown_until', case when z.capture_cooldown_until > now() then z.capture_cooldown_until end,
       'my_cooldown_until', (
         select c.last_hit_at + interval '6 hours'
         from zone_attacker_cooldowns c
@@ -646,7 +652,10 @@ begin
 
   update zones
   set owner_id = p_player_id,
-      nickname = case when p_keep_nickname then nickname else nullif(p_nickname, '') end
+      nickname = case when p_keep_nickname then nickname else nullif(p_nickname, '') end,
+      -- Only plain regular-zone captures start the anti-ping-pong cooldown —
+      -- home/invaded dethronings below use the curse instead.
+      capture_cooldown_until = case when v_tier = 'regular' then now() + interval '2 hours' else capture_cooldown_until end
   where id = v_zone_id;
 
   -- Any non-regular dethroning curses the loser and invalidates any
@@ -859,6 +868,7 @@ declare
   v_boss_max_hp int;
   v_last_attacker_id uuid;
   v_cooldown_last_hit timestamptz;
+  v_capture_cooldown_until timestamptz;
   v_event public.capture_events;
   v_result jsonb;
   v_contest_id uuid;
@@ -878,7 +888,7 @@ begin
     raise exception 'Place not found';
   end if;
 
-  select tier, owner_id into v_tier, v_owner_id from zones where id = v_zone_id;
+  select tier, owner_id, capture_cooldown_until into v_tier, v_owner_id, v_capture_cooldown_until from zones where id = v_zone_id;
 
   -- Boss Raid: sieging a home zone's rightful owner (see 07_home_zone_boss.sql).
   if v_tier = 'home' then
@@ -956,6 +966,14 @@ begin
   for update;
 
   if v_contest_id is null then
+    -- Anti-ping-pong: only gates *starting* a fresh contest on an
+    -- uncontested zone. Once a contest already exists (checked above),
+    -- joining it is never blocked by this — it's racing to settle a
+    -- capture that already happened, not starting a new one.
+    if v_capture_cooldown_until is not null and v_capture_cooldown_until > now() then
+      raise exception 'This zone is cooling down and can''t be captured for %.', public._format_time_remaining(v_capture_cooldown_until);
+    end if;
+
     insert into zone_contests (zone_id, join_deadline, instant_capturer_id)
     values (v_zone_id, now() + interval '1 minute', v_player_id)
     on conflict (zone_id) where status in ('joining', 'battling', 'awaiting_proof')
@@ -998,6 +1016,7 @@ declare
   v_cursed_until timestamptz;
   v_tier text;
   v_owner_id uuid;
+  v_capture_cooldown_until timestamptz;
   v_contest_id uuid;
   v_status text;
   v_mode text;
@@ -1010,7 +1029,7 @@ begin
     raise exception 'You are cursed and cannot capture zones for %.', public._format_time_remaining(v_cursed_until);
   end if;
 
-  select tier, owner_id into v_tier, v_owner_id from zones where id = p_zone_id;
+  select tier, owner_id, capture_cooldown_until into v_tier, v_owner_id, v_capture_cooldown_until from zones where id = p_zone_id;
   if v_tier is null then
     raise exception 'Zone not found';
   end if;
@@ -1030,6 +1049,12 @@ begin
   for update;
 
   if v_contest_id is null then
+    -- Anti-ping-pong: only gates *starting* a fresh contest on an
+    -- uncontested zone — see the matching comment in capture_zone.
+    if v_capture_cooldown_until is not null and v_capture_cooldown_until > now() then
+      raise exception 'This zone is cooling down and can''t be captured for %.', public._format_time_remaining(v_capture_cooldown_until);
+    end if;
+
     insert into zone_contests (zone_id, join_deadline, instant_capturer_id)
     values (p_zone_id, now() + interval '1 minute', v_player_id)
     on conflict (zone_id) where status in ('joining', 'battling', 'awaiting_proof')
