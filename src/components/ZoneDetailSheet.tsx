@@ -38,6 +38,10 @@ interface ZoneDetailSheetProps {
   // button should show at all.
   onViewUprising?: () => void;
   onViewMutiny?: () => void;
+  // Zone nickname — any owner, any tier, independent of Gifting above.
+  onRename?: (nickname: string) => void;
+  renaming?: boolean;
+  renameError?: string | null;
 }
 
 function relativeTime(timestamp: number): string {
@@ -85,11 +89,16 @@ export default function ZoneDetailSheet({
   giftError = null,
   onViewUprising,
   onViewMutiny,
+  onRename,
+  renaming = false,
+  renameError = null,
 }: ZoneDetailSheetProps) {
   const [visible, setVisible] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [giftPickerOpen, setGiftPickerOpen] = useState(false);
   const [pendingGiftRecipient, setPendingGiftRecipient] = useState<Player | null>(null);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [nicknameDraft, setNicknameDraft] = useState(zone.nickname ?? "");
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true));
@@ -126,6 +135,8 @@ export default function ZoneDetailSheet({
   // before one exists; everyone else only sees it once one's underway.
   const uprisingStarter = playerById(players, zone.originalOwnerId);
   const showUprisingCard = isInvaded && (hasActiveUprising || isOriginalOwner);
+
+  const nicknameChanged = nicknameDraft.trim() !== (zone.nickname ?? "");
 
   const hasActiveMutiny = Boolean(zone.activeMutinyId);
   const mutinyStarter = playerById(players, zone.activeMutinyInstigatorId);
@@ -479,6 +490,49 @@ export default function ZoneDetailSheet({
             {giftError && (
               <p className="mt-2 text-sm font-medium" style={{ color: "#ff6a6a" }}>
                 {giftError}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ─── Zone nickname — any owner, any tier ─── */}
+        {isOwnZone && onRename && (
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={() => setRenameOpen((v) => !v)}
+              className="h-14 w-full rounded-2xl text-base font-bold uppercase tracking-wide transition-colors duration-150 active:opacity-80"
+              style={{ background: "var(--surface-hover-active)", color: "var(--text-secondary)" }}
+            >
+              Rename Zone
+            </button>
+            {renameOpen && (
+              <div className="mt-3 flex flex-col gap-2 rounded-2xl border p-3" style={{ borderColor: "var(--border-container)" }}>
+                <input
+                  value={nicknameDraft}
+                  onChange={(e) => setNicknameDraft(e.target.value)}
+                  placeholder={zone.name}
+                  className="h-14 w-full rounded-2xl border-2 px-4 text-base outline-none"
+                  style={{
+                    background: "var(--surface-2)",
+                    borderColor: "var(--border-input)",
+                    color: "var(--text-primary, #fff)",
+                  }}
+                />
+                <button
+                  type="button"
+                  disabled={!nicknameChanged || renaming}
+                  onClick={() => onRename(nicknameDraft.trim())}
+                  className="h-14 w-full rounded-2xl text-base font-bold uppercase tracking-wide transition-colors duration-150 disabled:opacity-40 active:opacity-80"
+                  style={{ background: "#ffffff", color: "#0a0a0a" }}
+                >
+                  {renaming ? "Saving…" : "Save Nickname"}
+                </button>
+              </div>
+            )}
+            {renameError && (
+              <p className="mt-2 text-sm font-medium" style={{ color: "#ff6a6a" }}>
+                {renameError}
               </p>
             )}
           </div>

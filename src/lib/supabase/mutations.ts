@@ -164,6 +164,17 @@ export async function updateZone(input: {
   if (error) throw new Error(error.message);
 }
 
+export async function setZoneNickname(zoneId: string, nickname: string): Promise<void> {
+  const token = getSessionToken();
+  if (!token) throw new Error("Not logged in.");
+  const { error } = await supabase.rpc("set_zone_nickname", {
+    p_session_token: token,
+    p_zone_id: zoneId,
+    p_nickname: nickname,
+  });
+  if (error) throw new Error(error.message);
+}
+
 export async function deleteZone(zoneId: string): Promise<void> {
   const { error } = await supabase.rpc("delete_zone", {
     p_session_token: getSessionToken(),

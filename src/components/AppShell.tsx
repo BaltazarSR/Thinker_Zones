@@ -49,6 +49,7 @@ import {
   signOut,
   startMutiny,
   startUprising,
+  setZoneNickname,
   submitMutinyMove,
   submitRpsMove,
   transferZone,
@@ -298,6 +299,10 @@ export default function AppShell({ userId, onLoggedOut }: AppShellProps) {
   const [giftReceivedNotice, setGiftReceivedNotice] = useState<{ zoneName: string; giverName: string } | null>(
     null
   );
+
+  // Zone nickname.
+  const [renameSubmitting, setRenameSubmitting] = useState(false);
+  const [renameError, setRenameError] = useState<string | null>(null);
 
   // Shown instead of the usual inline error / window.alert whenever a
   // rejection turns out to be a curse — see isCursedMessage.
@@ -1157,6 +1162,19 @@ export default function AppShell({ userId, onLoggedOut }: AppShellProps) {
     }
   };
 
+  const handleRenameZone = async (zone: Zone, nickname: string) => {
+    setRenameSubmitting(true);
+    setRenameError(null);
+    try {
+      await setZoneNickname(zone.id, nickname);
+      setZones(await fetchZones());
+    } catch (err) {
+      setRenameError(err instanceof Error ? err.message : "Couldn't rename this zone.");
+    } finally {
+      setRenameSubmitting(false);
+    }
+  };
+
   const handleZoneDraftSubmit = async ({
     name,
     nickname,
@@ -1343,6 +1361,9 @@ export default function AppShell({ userId, onLoggedOut }: AppShellProps) {
           giftError={giftError}
           onViewUprising={() => handleViewUprising(selectedZone)}
           onViewMutiny={() => handleViewMutiny(selectedZone)}
+          onRename={(nickname) => handleRenameZone(selectedZone, nickname)}
+          renaming={renameSubmitting}
+          renameError={renameError}
         />
       )}
 
