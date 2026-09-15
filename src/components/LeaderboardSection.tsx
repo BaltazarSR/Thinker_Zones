@@ -183,7 +183,7 @@ export default function LeaderboardSection({ zones, players, onPlayerClick }: Le
                       {event.placeName}
                     </p>
                     <p className="mt-2 text-base" style={{ color: "var(--text-secondary)" }}>
-                      &ldquo;{event.caption}&rdquo;
+                      {event.caption}
                     </p>
                     <div className="mt-2 flex items-center gap-1.5">
                       <Avatar player={player} size={20} />
