@@ -395,6 +395,7 @@ declare
   v_player_id uuid;
   v_result jsonb;
   v_mutiny record;
+  v_contest record;
 begin
   select id into v_player_id from players where session_token = p_session_token;
   if v_player_id is null then
@@ -405,6 +406,14 @@ begin
   update zone_uprisings set status = 'expired' where status = 'gathering' and deadline < now();
   for v_mutiny in select id from zone_mutinies where status = 'rallying' and rally_deadline <= now() loop
     perform public._finalize_mutiny_rally_if_due(v_mutiny.id);
+  end loop;
+  -- Same for contest join windows — without this, a zone whose join window
+  -- expires with no participant ever polling get_contest/attempt_capture_zone
+  -- stays stuck reporting active_contest_status = 'joining' forever, which
+  -- keeps showing "Join the fight" and blocks the cooldown badge below it
+  -- from ever appearing (zoneOnCooldown requires active_contest_id to clear).
+  for v_contest in select id from zone_contests where status = 'joining' and join_deadline <= now() loop
+    perform public._finalize_join_window_if_due(v_contest.id);
   end loop;
 
   select coalesce(jsonb_agg(
