@@ -161,30 +161,34 @@ export default function ZoneDetailSheet({
           <CloseIcon />
         </button>
 
-        <div className="flex items-center gap-2 pr-12">
-          {isHome && (
-            <span
-              className="rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wider"
-              style={{ background: "var(--surface-hover-active)", color: "var(--text-secondary)" }}
-            >
-              Home
-            </span>
-          )}
-          {isInvaded && (
-            <span
-              className="rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wider"
-              style={{ background: "rgba(255,90,54,0.15)", color: "#ff8a68" }}
-            >
-              Invaded
-            </span>
-          )}
-          {zone.activeContestId && zone.activeContestParticipantIds.length > 1 && (
-            <span
-              className="rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wider"
-              style={{ background: "rgba(255,90,54,0.15)", color: "#ff8a68" }}
-            >
-              Contested
-            </span>
+        <div className="pr-12">
+          {(isHome || isInvaded || (zone.activeContestId && zone.activeContestParticipantIds.length > 1)) && (
+            <div className="mb-2 flex items-center gap-2">
+              {isHome && (
+                <span
+                  className="rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wider"
+                  style={{ background: "var(--surface-hover-active)", color: "var(--text-secondary)" }}
+                >
+                  Home
+                </span>
+              )}
+              {isInvaded && (
+                <span
+                  className="rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wider"
+                  style={{ background: "rgba(255,90,54,0.15)", color: "#ff8a68" }}
+                >
+                  Invaded
+                </span>
+              )}
+              {zone.activeContestId && zone.activeContestParticipantIds.length > 1 && (
+                <span
+                  className="rounded-md px-2 py-1 text-xs font-bold uppercase tracking-wider"
+                  style={{ background: "rgba(255,90,54,0.15)", color: "#ff8a68" }}
+                >
+                  Contested
+                </span>
+              )}
+            </div>
           )}
           <h2 className="text-2xl font-bold leading-tight" style={{ color: "var(--text-primary, #fff)" }}>
             {displayName}
